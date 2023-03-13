@@ -46,6 +46,13 @@ quarkus create && cd code-with-quarkus
 quarkus dev
 ```
 
-## `III> Basic Syntax`
-
-## `IV> Compare With Spring Boot`
+## `III> Compare With Spring Boot`
+### `3.1. Similar`
+- Both are Java Framework
+- Support initing project faster
+- Syntax is so relative similar
+- 
+### `3.2. Differences`
+| Comparison |      Spring Boot      |  Quarkus |
+|------------|:----------------------|:---------|
+| Dependencies |  Uses a robust Dependency Injection Container (DI). With its help, developers can lose some components and move the responsibility of managing these components to the container. | Uses CDI that helps connect together the web tier and transactional tier. |
