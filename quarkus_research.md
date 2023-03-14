@@ -212,3 +212,7 @@ Note that in this case we have one incoming and one outgoing connector configura
 mp.messaging.[outgoing|incoming].{channel-name}.property=value
 ```
 
+## Reference
+1. Quarkus Overview: https://quarkus.io/about/
+2. Quarkus with MongoDB: https://quarkus.io/guides/mongodb-panache
+3. Quarkus with Kafka: https://quarkus.io/guides/kafka
