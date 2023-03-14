@@ -53,60 +53,71 @@ The directives includes:
 EX:
 FROM python:3
 ```
+
 - `LABEL`: provide metadata for image
 ```
 EX:
 LABEL version="1.0"
 LABEL description="This text illustrates \
-that label-values can span multiple lines."
+that
 ```
+
 - `ENV`: set environment variable
 ```
 EX:
 ENV MY_NAME="John Doe"
 ```
+
 - `RUN`: execute any commands in a new layer on top of the current image and commit the results
 ```
 EX:
 RUN ["/bin/bash", "-c", "echo hello"]
 ```
+
 - `COPY`:  copies new files or directories from `src` and adds them to the filesystem of the container at the path `dest`
 ```
 EX:
 COPY hom* /mydir/
 ```
+
 - `ADD`: copies new files or directories from `src` and adds them to the filesystem of the container at the path `dest`
 ```
 EX:
 ADD hom* /mydir/
 ```
+
 - `CMD`: provide defaults for an executing container. These defaults can include an executable, or they can omit the executable, in which case you must specify an `ENTRYPOINT` instruction as well.
 ```
 EX:
 CMD echo "This is a test." | wc -
 ```
+
 - `WORKDIR`: Define workspace for other directives
 ```
 EX:
 WORKDIR /path/to/workdir
 ```
+
 - `ARG`: defines a variable that users can pass at build-time to the builder with the docker build command using the `--build-arg <varname>=<value>` flag
 ```
 EX:
 ARG buildno
 ARG user1=someuser
 ```
+
 - `ENTRYPOINT`:  allows you to configure a container that will run as an executable.
 ```
 EX:
 ENTRYPOINT ["/usr/sbin/apache2ctl", "-D", "FOREGROUND"]
 ```
+
 - `EXPOSE`: Define port for image
 ```
 EX:
 EXPOSE 80/tcp
 EXPOSE 80/udp
 ```
+
 - `VOLUME`: creates a mount point with the specified name and marks it as holding externally mounted volumes from native host or other containers
 ```
 EX:
@@ -117,3 +128,96 @@ VOLUME /myvolume
 - Systax to run Dockerfile: `docker build [OPTIONS] PATH | URL | -`
 If Dockerfile locate at current path we will use option `-t` instead of ` PATH | URL `
 - EX: `docker build -t demoapp:latest`
+
+## `IV> Docker Compose`
+Compose is a tool for defining and running multi-container Docker applications. With Compose, you use a YAML file to configure your application’s services. Then, with a single command, you create and start all the services from your configuration.
+
+### `4.1. Directives`
+Like Dockerfile, Docker Compose also has directives to build images
+Example:
+```
+version: "3.9"
+services:
+  frontend:
+    image: frontend
+    profiles: ["frontend"]
+
+  phpmyadmin:
+    image: phpmyadmin
+    depends_on:
+      - db
+    profiles:
+      - debug
+
+  backend:
+    image: backend
+
+  db:
+    image: mysql
+```
+### `4.2. How to use`
+To use Docker Compose At first, we have to install docker compose.
+
+Some Command is used in Docker Compose:
+
+- `build`: used to build images which is defined in docker compose file
+```
+docker compose build [OPTIONS] [SERVICE...]
+```
+
+- `config`: renders the actual data model to be applied on the Docker engine
+```
+docker compose config [OPTIONS] [SERVICE...]
+```
+
+- `up`: Builds, (re)creates, starts, and attaches to containers for a service.
+```
+docker compose up [OPTIONS] [SERVICE...]
+```
+
+- `down`: Stops containers and removes containers, networks, volumes, and images created by up
+```
+docker compose down [OPTIONS]
+```
+
+- `pause`: Pauses running containers of a service.
+```
+docker compose pause [SERVICE...]
+```
+
+- `unpause`: Unpauses paused containers of a service.
+```
+docker compose unpause [SERVICE...]
+```
+
+- `start`: Starts existing containers for a service
+```
+docker compose start [SERVICE...]
+```
+
+- `stop`: Stops running containers without removing them
+```
+docker compose stop [OPTIONS] [SERVICE...]
+```
+
+- `restart`: Restarts all stopped and running services, or the specified services only.
+```
+docker compose restart [OPTIONS] [SERVICE...]
+```
+
+- `logs`: Displays log output from services.
+```
+docker compose logs [OPTIONS] [SERVICE...]
+```
+
+- `images`: List images used by the created containers
+```
+docker compose images [OPTIONS] [SERVICE...]
+```
+
+- `exec`: Execute a command in a running container.
+```
+docker compose exec [OPTIONS] SERVICE COMMAND [ARGS...]
+```
+
+ 
