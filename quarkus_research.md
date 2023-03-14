@@ -51,8 +51,53 @@ quarkus dev
 - Both are Java Framework
 - Support initing project faster
 - Syntax is so relative similar
-- 
+
 ### `3.2. Differences`
 | Comparison |      Spring Boot      |  Quarkus |
-|------------|:----------------------|:---------|
+|------------|-----------------------|----------|
 | Dependencies |  Uses a robust Dependency Injection Container (DI). With its help, developers can lose some components and move the responsibility of managing these components to the container. | Uses CDI that helps connect together the web tier and transactional tier. |
+| Speed | Has slower Boot time than Quarkus.| Has faster boot time than Spring Boot. |
+| Front-End Development | Based on Spring MVC and includes such solid Java templates as ThymeLeaf. | Quarkus allows using both basic front-end options and experimental ones.|
+|Reactive App| Using Reactor’s Mono and Flux, Spring Boot helps create excellent reactive apps Quarkus and Spring Boot for Business | Since Quarkus has a reactive engine, it helps build reactive systems. For this aim, the framework often uses Mutiny. |
+| Features | Spring Boot have more feature than Quarkus | Quarkus have less feature than Spring Boot | 
+| Support | Spring Boot have more support than Quarkus| Quarkus have just released in 2019, therefore it hasn't more support| 
+
+## `IV> Researchs For Project`
+### `4.1. How to use MongoDB in Quarkus`
+#### `4.1.1. Dependencies`
+We have add these dependencies into project to use basic mongoDB
+- ***With Maven*** 
+```
+<dependency>
+    <groupId>io.quarkus</groupId>
+    <artifactId>quarkus-mongodb-client</artifactId>
+</dependency>
+```
+- ***With Gradle*** 
+```
+implementation("io.quarkus:quarkus-mongodb-client")
+```
+
+If you want to use MongoDB in project as JPA with Entity and Repository add these dependencies
+- ***With Maven*** 
+
+```
+<dependency>
+    <groupId>io.quarkus</groupId>
+    <artifactId>quarkus-mongodb-panache</artifactId>
+</dependency>
+```
+
+- ***With Gradle*** 
+```
+implementation("io.quarkus:quarkus-mongodb-panache")
+```
+#### `4.1.2. Configuation`
+To connect to MongoDB we have to add relevant configuration properties to file `application.properties`
+```
+# configure the MongoDB client for a replica set of two nodes
+quarkus.mongodb.connection-string = mongodb://mongo1:27017,mongo2:27017
+# mandatory if you don't specify the name of the database using @MongoEntity
+quarkus.mongodb.database = person
+```
+### `4.2. How to use Kafka in Quarkus`
