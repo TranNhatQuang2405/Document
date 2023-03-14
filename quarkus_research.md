@@ -23,14 +23,17 @@ The combination of Quarkus and Kubernetes provides an ideal environment for crea
 A cohesive platform for optimized developer joy with unified configuration and no hassle native executable generation. Zero config, live reload in the blink of an eye and streamlined code for the 80% common usages, flexible for the remainder 20%.
 
 ## `II> How To Create Project With Quarkus`
+
 ### `2.1. Requirements`
 *`JDK:`* JDK 11 or greater is required
+
 ### `2.2. Create From WebSite`
 - Step 1: Go to site https://code.quarkus.io/
 - Step 2: Fill information about project in form
 - Step 3: Select dependencies for project
 - Step 4: Click generate application and download zip file 
 - Step 5: Unzip zip file, open in ide and start project
+- 
 ### `2.3. Create From CMD`
 - Step 1: Install Quarkus 
 ```
@@ -47,6 +50,7 @@ quarkus dev
 ```
 
 ## `III> Compare With Spring Boot`
+
 ### `3.1. Similar`
 - Both are Java Framework
 - Support initing project faster
@@ -63,7 +67,9 @@ quarkus dev
 | Support | Spring Boot have more support than Quarkus| Quarkus have just released in 2019, therefore it hasn't more support| 
 
 ## `IV> Researchs For Project`
+
 ### `4.1. How to use MongoDB in Quarkus`
+
 #### `4.1.1. Dependencies`
 We have add these dependencies into project to use basic mongoDB
 - ***With Maven*** 
@@ -106,6 +112,7 @@ If you want to use MongoDB in project as JPA with Entity and Repository add thes
 implementation group: 'org.mongodb', name: 'bson', version: '4.9.0'
 implementation("io.quarkus:quarkus-mongodb-panache")
 ```
+
 #### `4.1.2. Configuation`
 To connect to MongoDB we have to add relevant configuration properties to file `application.properties`
 ```
@@ -114,6 +121,7 @@ quarkus.mongodb.connection-string = mongodb://mongo1:27017,mongo2:27017
 # mandatory if you don't specify the name of the database using @MongoEntity
 quarkus.mongodb.database = person
 ```
+
 #### `4.1.3. Implement`
 In this project we will use panache mongoDB
 - Step 1: Create Entity like below
@@ -173,4 +181,34 @@ person = personRepository.findById(personId);
 Optional<Person> optional = personRepository.findByIdOptional(personId);
 person = optional.orElseThrow(() -> new NotFoundException());
 ```
+
 ### `4.2. How to use Kafka in Quarkus`
+#### `4.1.1. Dependencies`
+To use Kafka in Quarkus we have to use this dependency
+- ***With Maven*** 
+```
+<dependency>
+    <groupId>io.quarkus</groupId>
+    <artifactId>quarkus-smallrye-reactive-messaging-kafka</artifactId>
+</dependency>
+```
+
+- ***With Gradle*** 
+```
+implementation("io.quarkus:quarkus-smallrye-reactive-messaging-kafka")
+```
+
+#### `4.1.2. Configuation`
+To use Kafka we have to add relevant configuration properties to file `application.properties`
+
+```
+# Configure the incoming `quote-requests` Kafka topic
+mp.messaging.incoming.requests.topic=quote-requests
+mp.messaging.incoming.requests.auto.offset.reset=earliest
+```
+
+Note that in this case we have one incoming and one outgoing connector configuration, each one distinctly named. The configuration keys are structured as follows:
+```
+mp.messaging.[outgoing|incoming].{channel-name}.property=value
+```
+
