@@ -40,4 +40,80 @@ When you use Docker, you are creating and using images, containers, networks, vo
 - Show log a container: ```docker logs <name of container>```
 - Build image from container: ```$ docker build -t <name of container>```
 - Pull image: ```$ docker pull <name of image>```
-  
+
+## `III> Dockerfile`
+Dockerfile is a config file which has directives for docker knows how to build a image from a basic image 
+
+### `3.1. Directives`
+
+The directives includes:
+- `FROM`: define the root/basic image 
+
+```
+EX:
+FROM python:3
+```
+- `LABEL`: provide metadata for image
+```
+EX:
+LABEL version="1.0"
+LABEL description="This text illustrates \
+that label-values can span multiple lines."
+```
+- `ENV`: set environment variable
+```
+EX:
+ENV MY_NAME="John Doe"
+```
+- `RUN`: execute any commands in a new layer on top of the current image and commit the results
+```
+EX:
+RUN ["/bin/bash", "-c", "echo hello"]
+```
+- `COPY`:  copies new files or directories from `src` and adds them to the filesystem of the container at the path `dest`
+```
+EX:
+COPY hom* /mydir/
+```
+- `ADD`: copies new files or directories from `src` and adds them to the filesystem of the container at the path `dest`
+```
+EX:
+ADD hom* /mydir/
+```
+- `CMD`: provide defaults for an executing container. These defaults can include an executable, or they can omit the executable, in which case you must specify an `ENTRYPOINT` instruction as well.
+```
+EX:
+CMD echo "This is a test." | wc -
+```
+- `WORKDIR`: Define workspace for other directives
+```
+EX:
+WORKDIR /path/to/workdir
+```
+- `ARG`: defines a variable that users can pass at build-time to the builder with the docker build command using the `--build-arg <varname>=<value>` flag
+```
+EX:
+ARG buildno
+ARG user1=someuser
+```
+- `ENTRYPOINT`:  allows you to configure a container that will run as an executable.
+```
+EX:
+ENTRYPOINT ["/usr/sbin/apache2ctl", "-D", "FOREGROUND"]
+```
+- `EXPOSE`: Define port for image
+```
+EX:
+EXPOSE 80/tcp
+EXPOSE 80/udp
+```
+- `VOLUME`: creates a mount point with the specified name and marks it as holding externally mounted volumes from native host or other containers
+```
+EX:
+VOLUME /myvolume
+```
+
+### `3.2. How to use`
+- Systax to run Dockerfile: `docker build [OPTIONS] PATH | URL | -`
+If Dockerfile locate at current path we will use option `-t` instead of ` PATH | URL `
+- EX: `docker build -t demoapp:latest`
