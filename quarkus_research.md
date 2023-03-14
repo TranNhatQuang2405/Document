@@ -183,7 +183,7 @@ person = optional.orElseThrow(() -> new NotFoundException());
 ```
 
 ### `4.2. How to use Kafka in Quarkus`
-#### `4.1.1. Dependencies`
+#### `4.2.1. Dependencies`
 To use Kafka in Quarkus we have to use this dependency
 - ***With Maven*** 
 ```
@@ -198,7 +198,7 @@ To use Kafka in Quarkus we have to use this dependency
 implementation("io.quarkus:quarkus-smallrye-reactive-messaging-kafka")
 ```
 
-#### `4.1.2. Configuation`
+#### `4.2.2. Configuation`
 To use Kafka we have to add relevant configuration properties to file `application.properties`
 
 ```
