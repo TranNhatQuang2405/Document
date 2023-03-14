@@ -220,4 +220,11 @@ docker compose images [OPTIONS] [SERVICE...]
 docker compose exec [OPTIONS] SERVICE COMMAND [ARGS...]
 ```
 
+
+
+## Reference
+1. Docker Overview: https://docs.docker.com/get-started/overview/
+2. Dockerfile: https://docs.docker.com/engine/reference/builder/
+3. Docker Compose: https://docs.docker.com/compose/reference/
+
  
