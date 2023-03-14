@@ -69,12 +69,19 @@ We have add these dependencies into project to use basic mongoDB
 - ***With Maven*** 
 ```
 <dependency>
+    <groupId>org.mongodb</groupId>
+    <artifactId>bson</artifactId>
+    <version>4.9.0</version>
+</dependency>
+
+<dependency>
     <groupId>io.quarkus</groupId>
     <artifactId>quarkus-mongodb-client</artifactId>
 </dependency>
 ```
 - ***With Gradle*** 
 ```
+implementation group: 'org.mongodb', name: 'bson', version: '4.9.0'
 implementation("io.quarkus:quarkus-mongodb-client")
 ```
 
@@ -83,6 +90,12 @@ If you want to use MongoDB in project as JPA with Entity and Repository add thes
 
 ```
 <dependency>
+    <groupId>org.mongodb</groupId>
+    <artifactId>bson</artifactId>
+    <version>4.9.0</version>
+</dependency>
+
+<dependency>
     <groupId>io.quarkus</groupId>
     <artifactId>quarkus-mongodb-panache</artifactId>
 </dependency>
@@ -90,6 +103,7 @@ If you want to use MongoDB in project as JPA with Entity and Repository add thes
 
 - ***With Gradle*** 
 ```
+implementation group: 'org.mongodb', name: 'bson', version: '4.9.0'
 implementation("io.quarkus:quarkus-mongodb-panache")
 ```
 #### `4.1.2. Configuation`
@@ -99,5 +113,64 @@ To connect to MongoDB we have to add relevant configuration properties to file `
 quarkus.mongodb.connection-string = mongodb://mongo1:27017,mongo2:27017
 # mandatory if you don't specify the name of the database using @MongoEntity
 quarkus.mongodb.database = person
+```
+#### `4.1.3. Implement`
+In this project we will use panache mongoDB
+- Step 1: Create Entity like below
+```
+@MongoEntity(collection="ThePerson")
+public class Person  {
+    public ObjectId id; // used by MongoDB for the _id field
+    public String name;
+    public LocalDate birth;
+    public Status status;
+}
+```
+- Step 2: Create Repository for Entity which have been created before
+```
+@ApplicationScoped
+public class PersonRepository implements PanacheMongoRepository<Person> {
+
+   // put your custom logic here as instance methods
+
+   public Person findByName(String name){
+       return find("name", name).firstResult();
+   }
+
+   public List<Person> findAlive(){
+       return list("status", Status.Alive);
+   }
+}
+```
+After finishing these steps above we can use mongoDB like knownlegde about JPA
+```
+// creating a person
+Person person = new Person();
+person.name = "Loïc";
+person.birth = LocalDate.of(1910, Month.FEBRUARY, 1);
+person.status = Status.Alive;
+
+// persist it: if you keep the default ObjectId ID field, it will be populated by the MongoDB driver
+personRepository.persist(person);
+
+person.status = Status.Dead;
+
+// Your must call update() in order to send your entity modifications to MongoDB
+personRepository.update(person);
+
+// delete it
+personRepository.delete(person);
+
+// getting a list of all Person entities
+List<Person> allPersons = personRepository.listAll();
+
+// finding a specific person by ID
+// here we build a new ObjectId, but you can also retrieve it from the existing entity after being persisted
+ObjectId personId = new ObjectId(idAsString);
+person = personRepository.findById(personId);
+
+// finding a specific person by ID via an Optional
+Optional<Person> optional = personRepository.findByIdOptional(personId);
+person = optional.orElseThrow(() -> new NotFoundException());
 ```
 ### `4.2. How to use Kafka in Quarkus`
