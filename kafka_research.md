@@ -65,3 +65,145 @@ Large user community, quick support when needed
 - Slow processing: Sometimes the number of queues in Kafka cluster spikes causing Kafka to process slower.
 
 ## `II> How to set up`
+To create Apache Kafka service we have to install two things:
+- Apache Kafka
+- Zookeeper
+
+### `2.1. Install Manual`
+We can download binary source from apache site:
+- Apache Kafka: https://kafka.apache.org/downloads
+- Zookeeper: https://zookeeper.apache.org/releases.html#download
+
+After download we can run manual by SH script in each source
+
+### `2.2. Install in Docker`
+We can use following docker compose script below:
+```
+version: '3'
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:6.0.0
+    hostname: zookeeper
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - kafka
+
+  kafka:
+    image: confluentinc/cp-enterprise-kafka:6.0.0
+    hostname: kafka
+    restart: "always"
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "29092:29092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: |
+         PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: |
+         PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+    networks:
+      - kafka
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    restart: "no"
+    ports:
+      - "9080:8080"
+    environment:
+      KAFKA_CLUSTERS_0_NAME: "kafka"
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: "kafka:9092"
+    networks:
+      - kafka
+
+networks:
+  kafka: 
+    external:
+      name: kafka
+```
+
+In above script, we have 3 service in docker, it contains zookeeper, kafka and  kafka-ui, each service interact together by kafka network.
+
+After run above script we will have 3 service in docker container
+
+<img src="./images/kafka-service.png">
+
+Access to `http://localhost:9080/` we will see UI for Kafka managerment
+
+<img src="./images/kafka-ui.png">
+
+## `III> How to use in Quarkus ?`
+
+To implement in quarkus we have to add library to support Kafka 
+
+In `properties` file we have to define instruction for kafka to create topic and receive message from topic
+
+```
+kafka.bootstrap.servers=http://localhost:29092
+
+# Configure the Kafka source (we read from it)
+mp.messaging.incoming.gas-in.connector=smallrye-kafka
+mp.messaging.incoming.gas-in.topic=gas
+#mp.messaging.incoming.gas-in.value.deserializer=com.example.kafka.GasDeserializer
+
+# Configure the Kafka sink (we write to it)
+mp.messaging.outgoing.gas-out.connector=smallrye-kafka
+mp.messaging.outgoing.gas-out.topic=gas
+mp.messaging.outgoing.gas-out.value.serializer=io.quarkus.kafka.client.serialization.ObjectMapperSerializer
+````
+
+about property code will register topic has name "gas" in Kafka and config path to read and send data in kafka
+
+To send data to kafka we have to use following code
+```
+    @Inject
+    @Channel("gas-out")
+    Emitter<Gas> gasEmitter;
+```
+
+To read data from Kafka we have to register a consumer 
+```
+    @Incoming("gas-in")
+    public void outputGas(Gas gas){
+        System.out.printf("Gas price has been increased to %s",gas.price);
+    }
+```
+
+After finished steps above we can send data to check Kafka
+
+Code to test:
+```
+curl -X 'POST' \
+  'http://localhost:8080/gas' \
+  -H 'accept: */*' \
+  -H 'Content-Type: application/json' \
+  -d '{
+  "name": "Xăng A999",
+  "price": 222222666
+}
+```
+
+Result:
+```
+2023-03-17 13:59:41,180 INFO  [io.sma.rea.mes.kafka] (Quarkus Main Thread) SRMSG18229: Configured topics for channel 'gas-in': [gas]
+2023-03-17 13:59:41,197 INFO  [io.sma.rea.mes.kafka] (Quarkus Main Thread) SRMSG18214: Key deserializer omitted, using String as default
+2023-03-17 13:59:41,419 INFO  [io.sma.rea.mes.kafka] (smallrye-kafka-producer-thread-0) SRMSG18258: Kafka producer kafka-producer-gas-out, connected to Kafka brokers 'http://localhost:29092', is configured to write records to 'gas'
+2023-03-17 13:59:41,453 INFO  [io.sma.rea.mes.kafka] (smallrye-kafka-consumer-thread-0) SRMSG18257: Kafka consumer kafka-consumer-gas-in, connected to Kafka brokers 'http://localhost:29092', belongs to the 'kafka-demo' consumer group and is configured to poll records from [gas]
+2023-03-17 13:59:41,549 INFO  [io.quarkus] (Quarkus Main Thread) kafka-demo 1.0-SNAPSHOT on JVM (powered by Quarkus 2.16.4.Final) started in 3.369s. Listening on: http://localhost:8080
+2023-03-17 13:59:41,549 INFO  [io.quarkus] (Quarkus Main Thread) Profile dev activated. Live Coding activated.
+2023-03-17 13:59:41,550 INFO  [io.quarkus] (Quarkus Main Thread) Installed features: [cdi, kafka-client, resteasy-reactive, resteasy-reactive-jackson, resteasy-reactive-jsonb, smallrye-context-propagation, smallrye-reactive-messaging, smallrye-reactive-messaging-kafka, vertx]
+2023-03-17 14:01:06,533 INFO  [io.sma.rea.mes.kafka] (vert.x-eventloop-thread-3) SRMSG18256: Initialize record store for topic-partition 'gas-0' at position 13.
+Gas price has been increased to 3.33333999E8
+```
+
+All of source code you will see at: https://github.com/TranNhatQuang2405/Kafka_Quarkus
